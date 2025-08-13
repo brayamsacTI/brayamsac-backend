@@ -13,16 +13,11 @@ export const loginLimiter = rateLimit({
   skip: () => true, // Saltar el rate limiting completamente
 });
 
-// Rate limiting general para API
-export const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: process.env.NODE_ENV === 'development' ? 1000 : 100, // Más permisivo en desarrollo
-  message: {
-    error: 'Demasiadas peticiones. Intenta de nuevo más tarde.'
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+// Rate limiting general para API - Completamente deshabilitado
+export const apiLimiter = (req, res, next) => {
+  // Sin límites de peticiones - acceso libre
+  next();
+};
 
 // Configuración de helmet para headers de seguridad
 export const helmetConfig = helmet({

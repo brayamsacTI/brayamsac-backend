@@ -12,7 +12,7 @@ dotenv.config(); // Cargar variables de entorno
 
 // 🧩 Middlewares
 import { manejarErrores } from './middlewares/error.middleware.js';
-import { helmetConfig, apiLimiter } from './middlewares/security.middleware.js';
+import { helmetConfig } from './middlewares/security.middleware.js';
 import { sanitizarInput } from './middlewares/validation.middleware.js';
 
 // 🚦 Rutas
@@ -90,7 +90,6 @@ app.use(cors({
   optionsSuccessStatus: 200 // Para compatibilidad con navegadores legacy
 }));
 app.use(helmetConfig); // Headers de seguridad (después de CORS)
-app.use(apiLimiter); // Rate limiting general
 app.use(express.json({ limit: '10mb' })); // Limitar tamaño del body
 app.use(sanitizarInput); // Sanitización de input
 
