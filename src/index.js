@@ -14,6 +14,7 @@ dotenv.config(); // Cargar variables de entorno
 import { manejarErrores } from './middlewares/error.middleware.js';
 import { helmetConfig } from './middlewares/security.middleware.js';
 import { sanitizarInput } from './middlewares/validation.middleware.js';
+import { dbErrorHandler, healthCheckEndpoint } from './middleware/dbErrorHandler.js';
 
 // 🚦 Rutas
 import authRoutes from './routes/auth.routes.js';
@@ -193,8 +194,13 @@ app.use('/api/usuario-almacenes', usuarioAlmacenesRoutes);
 app.use('/api/trabajadorAsistencia', trabajadorAsistenciaRoutes);
 app.use('/api/rotaciones', rotacionRoutes);
 app.use('/api/notifications', notificationsRoutes);
-// 🚨 Middleware de errores (siempre al final)
-app.use(manejarErrores);
+
+// 🏥 Health check específico para base de datos
+app.get('/api/health/database', healthCheckEndpoint);
+
+// 🚨 Middlewares de manejo de errores (deben ir al final)
+app.use(dbErrorHandler); // Manejo específico de errores de DB
+app.use(manejarErrores); // Manejo general de errores
 
 // 🚀 Arrancar servidor
 const PORT = process.env.PORT || 3000;

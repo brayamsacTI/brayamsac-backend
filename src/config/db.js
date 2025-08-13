@@ -17,7 +17,7 @@ if (process.env.NODE_ENV === 'production') {
   dotenv.config({ path: optimizationPath });
 }
 
-// ⚡ CONFIGURACIÓN OPTIMIZADA PARA PRODUCCIÓN CON RECONEXIÓN AUTOMÁTICA
+// ⚡ CONFIGURACIÓN OPTIMIZADA PARA PRODUCCIÓN CON RECONEXIÓN AUTOMÁTICA Y TIMEOUTS
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT || 3306,
@@ -25,11 +25,26 @@ const pool = mysql.createPool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   waitForConnections: true,
-  connectionLimit: process.env.MYSQL_CONNECTION_LIMIT || (process.env.NODE_ENV === 'production' ? 10 : 5),
+  connectionLimit: process.env.MYSQL_CONNECTION_LIMIT || (process.env.NODE_ENV === 'production' ? 8 : 5),
   queueLimit: 0,
   charset: 'utf8mb4',
+  // Configuraciones de timeout para evitar ERR_ABORTED
+  acquireTimeout: 20000, // 20 segundos para obtener conexión
+  timeout: 15000, // 15 segundos para consultas
+  reconnect: true,
+  idleTimeout: 300000, // 5 minutos de inactividad
+  maxReconnects: 3,
+  // Configuraciones adicionales para estabilidad
+  supportBigNumbers: true,
+  bigNumberStrings: true,
+  dateStrings: false,
+  debug: false,
+  multipleStatements: false,
   // Habilitar SSL para conexiones remotas en producción
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined
+  ssl: process.env.NODE_ENV === 'production' ? { 
+    rejectUnauthorized: false,
+    timeout: 10000 // timeout SSL de 10 segundos
+  } : undefined
 });
 
 // Test de conexión silencioso (solo errores)
